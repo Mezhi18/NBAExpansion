@@ -3,7 +3,7 @@ title: "Is it time for an NBA expansion?"
 subtitle: "My subtitle if needed"
 author: 
   - Yan Mezhiborsky
-thanks: "Code and data are available at: LINK."
+thanks: "Code and data are available at: ."
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
