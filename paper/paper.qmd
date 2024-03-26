@@ -2,8 +2,7 @@
 title: "Is it time for an NBA expansion?"
 subtitle: "My subtitle if needed"
 author: 
-  - First author
-  - Another author
+  - Yan Mezhiborsky
 thanks: "Code and data are available at: LINK."
 date: today
 date-format: long
