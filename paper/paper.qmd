@@ -1,5 +1,5 @@
 ---
-title: "My title"
+title: "Is it time for an NBA expansion?"
 subtitle: "My subtitle if needed"
 author: 
   - First author
