@@ -2,7 +2,7 @@
 
 ## Overview
 
-In this ppaper we will be investigating wether the NBA should be looking to expanding the league by adding additional NBA Teams.
+In this paper we will be investigating whether the NBA should be looking to expanding the league by adding additional NBA Teams.
 
 Is it time for an NBA Expansion?
 
