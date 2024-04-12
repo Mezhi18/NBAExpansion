@@ -111,10 +111,11 @@ for(year in 1980:2023) {
 #Remove Less important columns
 full_nba_data <- combined_data %>% select(-"G", -"MP", -"2P", -"2PA", -"2P%")
 
-# creating table for league average
+#creating table for league average
 nba_data <- full_nba_data %>% 
   filter(Team == "League Average")
 
+#saving Clean Data
 write.csv(nba_data, "../data/clean_data/nba_data.csv", row.names = FALSE)
 write.csv(full_nba_data, "../data/clean_data/full_nba_data.csv", row.names = FALSE)
 ```
@@ -236,26 +237,7 @@ In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. 
 
 In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
 
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
 
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
 
 ## Diagnostics
 
@@ -263,20 +245,7 @@ posterior_vs_prior(first_model) +
 
 @fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
 
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
 
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
 
 
 
