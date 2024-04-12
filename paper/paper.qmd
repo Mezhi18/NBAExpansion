@@ -130,14 +130,7 @@ And also planes (@fig-planes). (You can change the height and width, but don't w
 #| warning: false
 #| message: false
 
-analysis_data <- read_csv(here::here("data/analysis_data/analysis_data.csv"))
 
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
 ```
 
 Talk way more about it. 
@@ -183,11 +176,29 @@ Our results are summarized in @tbl-modelresults.
 #| warning: false
 #| message: false
 
-library(rstanarm)
+# Reshape data from wide to long format
+nba_data_long <- nba_data %>%
+  pivot_longer(cols = c(AST, TRB, PTS, STL, BLK), names_to = "Statistic", values_to = "Value")
 
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
+line_colors <- c("red", "green", "blue", "purple", "orange")
+
+exp_year <- c(1988, 1989, 1995, 2004)
+
+combined_plot <- ggplot(nba_data_long, aes(x = Year, y = Value)) +
+  geom_point(color = "black") +  # All points in black
+  geom_smooth(method = "lm", aes(color = Statistic), se = FALSE) +  # Lines of best fit with different colors
+  scale_color_manual(values = line_colors) +
+  geom_vline(xintercept = exp_year, color = "black", linetype = "dashed") +
+  facet_wrap(~Statistic, scales = "free_y") +  # Facet by statistic, with free y scales
+  labs(title = "NBA Stats Over Years", x = "Year", y = "Value") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+combined_plot
+
 ```
+
+
 
 
 
