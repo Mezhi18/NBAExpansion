@@ -37,7 +37,9 @@ The remainder of this paper is structured as follows. @sec-data....
 Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
 ```{r}
-
+#| include: false
+#| warning: false
+#| message: false
 
 NBA1980 <- read_csv("../data/raw_data/NBA1980.csv")
 NBA1981 <- read_csv("../data/raw_data/NBA1981.csv")
@@ -87,7 +89,10 @@ NBA2023 <- read_csv("../data/raw_data/NBA2023.csv")
 ```
 
 ```{r}
-
+#| include: false
+#| warning: false
+#| message: false
+#| 
 #combining data into one table
 combined_data <- data.frame()
 
@@ -103,11 +108,15 @@ for(year in 1980:2023) {
   # Combine with the main data frame
   combined_data <- bind_rows(combined_data, yearly_data)
 }
+#Remove Less important columns
+full_nba_data <- combined_data %>% select(-"G", -"MP", -"2P", -"2PA", -"2P%")
 
 # creating table for league average
-league_average_data <- combined_data %>% 
+nba_data <- full_nba_data %>% 
   filter(Team == "League Average")
 
+write.csv(nba_data, "../data/clean_data/nba_data.csv", row.names = FALSE)
+write.csv(full_nba_data, "../data/clean_data/full_nba_data.csv", row.names = FALSE)
 ```
 
 Talk more about it.
