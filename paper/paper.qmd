@@ -3,7 +3,7 @@ title: "Is it time for an NBA expansion?"
 subtitle: "My subtitle if needed"
 author: 
   - Yan Mezhiborsky
-thanks: "Code and data are available at: ."
+thanks: "Code and data are available at: https://github.com/Mezhi18/NBAExpansion ."
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
@@ -109,7 +109,7 @@ for(year in 1980:2023) {
   combined_data <- bind_rows(combined_data, yearly_data)
 }
 #Remove Less important columns
-full_nba_data <- combined_data %>% select(-"G", -"MP", -"2P", -"2PA", -"2P%")
+full_nba_data <- combined_data %>% select(-"G", -"MP", -"2P", -"2PA", -"2P%", -"Rk")
 
 #creating table for league average
 nba_data <- full_nba_data %>% 
@@ -183,7 +183,7 @@ nba_data_long <- nba_data %>%
 
 line_colors <- c("red", "green", "blue", "purple", "orange")
 
-exp_year <- c(1988, 1989, 1995, 2004)
+exp_year <- c(1988, 1989, 1995, 2004) #Exansion Year
 
 combined_plot <- ggplot(nba_data_long, aes(x = Year, y = Value)) +
   geom_point(color = "black") +  # All points in black
@@ -200,6 +200,27 @@ combined_plot
 ```
 
 
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+current_nba_data_long <- nba_data %>%
+  filter(Year >= 2004) %>%  # Keep only years from 2004 onwards
+  pivot_longer(cols = c(AST, TRB, PTS, STL, BLK), names_to = "Statistic", values_to = "Value")
+
+current_plot <- ggplot(current_nba_data_long, aes(x = Year, y = Value)) +
+  geom_point(color = "black") +  # All points in black
+  geom_smooth(method = "lm", aes(color = Statistic), se = FALSE) +  # Lines of best fit with different colors
+  scale_color_manual(values = line_colors) +
+  facet_wrap(~Statistic, scales = "free_y") +  # Facet by statistic, with free y scales
+  labs(title = "NBA Stats Over Years (Post-2004)", x = "Year", y = "Value") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+current_plot
+```
 
 
 
