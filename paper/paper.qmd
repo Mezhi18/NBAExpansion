@@ -146,15 +146,17 @@ Here we briefly describe the Bayesian analysis model used to investigate... Back
 
 ## Model set-up
 
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+Define $y_i$ as the average number of points per game scored by a team through out the NBA season. Then $\alpha$ is the average assists per game, $\rho$ the average rebounds per game, $\beta$ is blocks per game, $\psi$ is steals per game and lastly, $\tau$ is turnovers per game.
 
 \begin{align} 
 y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
+\mu_i &= \alpha + \rho_i + \beta_i + \xi_i + \tau_i \\
 \alpha &\sim \mbox{Normal}(0, 2.5) \\
+\rho &\sim \mbox{Normal}(0, 2.5) \\
 \beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
+\psi &\sim \mbox{Normal}(0,2.5) \\
+\tau &\sim \mbox{Normal}(0,2.5) \\
+\sigma &\sim \mbox{Exponential}(1) \\
 \end{align}
 
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
@@ -179,9 +181,9 @@ Our results are summarized in @tbl-modelresults.
 
 # Reshape data from wide to long format
 nba_data_long <- nba_data %>%
-  pivot_longer(cols = c(AST, TRB, PTS, STL, BLK), names_to = "Statistic", values_to = "Value")
+  pivot_longer(cols = c(AST, TRB, PTS, STL, BLK, TOV), names_to = "Statistic", values_to = "Value")
 
-line_colors <- c("red", "green", "blue", "purple", "orange")
+line_colors <- c("red", "green", "blue", "purple", "orange", "cyan")
 
 exp_year <- c(1988, 1989, 1995, 2004) #Exansion Year
 
@@ -208,7 +210,7 @@ combined_plot
 
 current_nba_data_long <- nba_data %>%
   filter(Year >= 2004) %>%  # Keep only years from 2004 onwards
-  pivot_longer(cols = c(AST, TRB, PTS, STL, BLK), names_to = "Statistic", values_to = "Value")
+  pivot_longer(cols = c(AST, TRB, PTS, STL, BLK, TOV), names_to = "Statistic", values_to = "Value")
 
 current_plot <- ggplot(current_nba_data_long, aes(x = Year, y = Value)) +
   geom_point(color = "black") +  # All points in black
