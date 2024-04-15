@@ -196,30 +196,21 @@ sim_nba_data <- data.frame(
   TOV = rnorm(440, mean = mean(full_nba_data$TOV), sd = sd(full_nba_data$TOV)) 
 )
 
-sim_nba_data <- sim_nba_data %>%
-  mutate(
-    PPG = PTS + 
-          Year * 0.05 -           # Hypothetical influence of year on PPG
-          Num_teams * 0.1 +       # Hypothetical influence of number of teams on PPG
-          AST * 0.3 +             # Influence of assists per game
-          TRB * 0.2 -             # Influence of rebounds per game
-          STL * 0.15 +            # Influence of steals per game
-          BLK * 0.1 -             # Influence of blocks per game
-          TOV * (-0.25)           # Influence of turnovers per game
-  )
-
 # Fit a multiple linear regression model
-nba_model <- lm(PTS ~ Year * Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data)
-madal <- lm(PTS ~ Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data)
+nba_model <- lm(PTS ~ Year * Num_teams^2 + AST^2 + TRB^2 + STL + BLK + TOV, data = sim_nba_data)
+model_ny <- lm(PTS ~ Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data)
 
 # Summary of the linear model
 msummary(
   list(
-    "times" = nba_model,
-    "plus" = madal
+    "With Year" = nba_model,
+    "Without Year" = model_ny
   ),
   fmt = 2
   )
+
+```
+
 
 ```
 
