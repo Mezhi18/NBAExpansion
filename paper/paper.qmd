@@ -20,6 +20,7 @@ bibliography: references.bib
 
 library(tidyverse)
 library(readr)
+library(modelsummary)
 
 ```
 
@@ -92,8 +93,7 @@ NBA2023 <- read_csv("../data/raw_data/NBA2023.csv")
 #| include: false
 #| warning: false
 #| message: false
-#| 
-#combining data into one table
+
 combined_data <- data.frame()
 
 # Loop through the years 1980 to 2023
@@ -108,14 +108,27 @@ for(year in 1980:2023) {
   # Combine with the main data frame
   combined_data <- bind_rows(combined_data, yearly_data)
 }
-#Remove Less important columns
-full_nba_data <- combined_data %>% select(-"G", -"MP", -"2P", -"2PA", -"2P%", -"Rk")
 
-#creating table for league average
+# Add the number of teams to the combined data before selecting columns
+combined_data <- combined_data %>%
+  mutate(Num_Teams = case_when(
+    Year <= 1980 ~ 22,
+    Year > 1980 & Year <= 1988 ~ 23,
+    Year == 1989 ~ 25,  
+    Year > 1989 & Year <= 1995 ~ 27,
+    Year > 1995 & Year <= 2004 ~ 29,
+    TRUE ~ 30  # For years after 2004
+  ))
+
+# Now remove less important columns
+full_nba_data <- combined_data %>%
+  select(-G, -MP, -`2P`, -`2PA`, -`2P%`, -Rk)
+
+# Creating table for league average
 nba_data <- full_nba_data %>% 
   filter(Team == "League Average")
 
-#saving Clean Data
+# Saving Clean Data
 write.csv(nba_data, "../data/clean_data/nba_data.csv", row.names = FALSE)
 write.csv(full_nba_data, "../data/clean_data/full_nba_data.csv", row.names = FALSE)
 ```
@@ -158,6 +171,46 @@ y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 \tau &\sim \mbox{Normal}(0,2.5) \\
 \sigma &\sim \mbox{Exponential}(1) \\
 \end{align}
+
+```{r}
+#| warning: false
+#| message: false
+
+
+
+# Simulating data
+set.seed(123)  # For reproducibility
+sim_nba_data <- data.frame(
+  Year = rep(1980:2023, times = 10),  # Simulate 10 records per year
+  Num_teams = c(rep(22, each = 1 * 10),
+                rep(23, each = 8 * 10),
+                rep(25, each = 1 * 10),
+                rep(27, each = 6 * 10),
+                rep(29, each = 9 * 10),
+                rep(30, each = 19 * 10)),  # Adjusted each parameter as needed
+  PTS = rnorm(440, mean = mean(full_nba_data$PTS), sd = sd(full_nba_data$PTS)),  
+  AST = rnorm(440, mean = mean(full_nba_data$AST), sd = sd(full_nba_data$AST)), 
+  TRB = rnorm(440, mean = mean(full_nba_data$TRB), sd = sd(full_nba_data$TRB)),  
+  STL = rnorm(440, mean = mean(full_nba_data$STL), sd = sd(full_nba_data$STL)),  
+  BLK = rnorm(440, mean = mean(full_nba_data$BLK), sd = sd(full_nba_data$BLK)),  
+  TOV = rnorm(440, mean = mean(full_nba_data$TOV), sd = sd(full_nba_data$TOV)) 
+)
+# Add a column for PPG that depends on the year and number of teams, 
+# as well as other factors. Adjust the coefficients as needed for your simulation.
+sim_nba_data_1 <- sim_nba_data %>%
+  mutate(PPG = (PTS / 82) + (Year - 1980) * 0.2 - (Num_teams - 22) * 0.1 +
+                0.1 * AST + 0.05 * TRB - 0.05 * STL + 0.05 * BLK - 0.05 * TOV)
+
+# Fit a multiple linear regression model
+nba_model <- lm(PTS ~ Year * Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data)
+nba_model_1 <- lm(PTS ~ Year * Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data_1)
+
+# Summary of the linear model
+msummary(nba_model)
+modelsummary(nba_model_1)
+
+```
+
 
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
 
