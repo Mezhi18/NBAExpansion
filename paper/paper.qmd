@@ -21,7 +21,7 @@ bibliography: references.bib
 library(tidyverse)
 library(readr)
 library(modelsummary)
-
+library(tinytex)
 ```
 
 
@@ -195,19 +195,21 @@ sim_nba_data <- data.frame(
   BLK = rnorm(440, mean = mean(full_nba_data$BLK), sd = sd(full_nba_data$BLK)),  
   TOV = rnorm(440, mean = mean(full_nba_data$TOV), sd = sd(full_nba_data$TOV)) 
 )
-# Add a column for PPG that depends on the year and number of teams, 
-# as well as other factors. Adjust the coefficients as needed for your simulation.
-sim_nba_data_1 <- sim_nba_data %>%
-  mutate(PPG = (PTS / 82) + (Year - 1980) * 0.2 - (Num_teams - 22) * 0.1 +
-                0.1 * AST + 0.05 * TRB - 0.05 * STL + 0.05 * BLK - 0.05 * TOV)
+
+
 
 # Fit a multiple linear regression model
 nba_model <- lm(PTS ~ Year * Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data)
-nba_model_1 <- lm(PTS ~ Year * Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data_1)
+madal <- lm(PTS ~ Year + Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data)
 
 # Summary of the linear model
-msummary(nba_model)
-modelsummary(nba_model_1)
+msummary(
+  list(
+    "times" = nba_model,
+    "plus" = madal
+  ),
+  fmt = 2
+  )
 
 ```
 
@@ -238,7 +240,7 @@ nba_data_long <- nba_data %>%
 
 line_colors <- c("red", "green", "blue", "purple", "orange", "cyan")
 
-exp_year <- c(1988, 1989, 1995, 2004) #Exansion Year
+exp_year <- c(1988, 1989, 1995, 2004) #Expansion Year
 
 combined_plot <- ggplot(nba_data_long, aes(x = Year, y = Value)) +
   geom_point(color = "black") +  # All points in black
