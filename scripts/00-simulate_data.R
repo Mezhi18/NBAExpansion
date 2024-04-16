@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Simulates NBA Data Based on Given Data
+# Purpose: Simulates NBA Data Based
 # Author: Yan Mezhiborsky
 # Date: 18 April 2024
 # Contact: yan.mezhiborsky@mail.utoronto.ca

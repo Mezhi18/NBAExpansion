@@ -10,35 +10,41 @@
 #### Workspace setup ####
 library(tidyverse)
 
-#### Clean data ####
-raw_data <- read_csv("inputs/data/plane_data.csv")
+#### Cleaning Data ####
+combined_data <- data.frame()
 
-cleaned_data <-
-  raw_data |>
-  janitor::clean_names() |>
-  select(wing_width_mm, wing_length_mm, flying_time_sec_first_timer) |>
-  filter(wing_width_mm != "caw") |>
-  mutate(
-    flying_time_sec_first_timer = if_else(flying_time_sec_first_timer == "1,35",
-                                   "1.35",
-                                   flying_time_sec_first_timer)
-  ) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "490",
-                                 "49",
-                                 wing_width_mm)) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "6",
-                                 "60",
-                                 wing_width_mm)) |>
-  mutate(
-    wing_width_mm = as.numeric(wing_width_mm),
-    wing_length_mm = as.numeric(wing_length_mm),
-    flying_time_sec_first_timer = as.numeric(flying_time_sec_first_timer)
-  ) |>
-  rename(flying_time = flying_time_sec_first_timer,
-         width = wing_width_mm,
-         length = wing_length_mm
-         ) |> 
-  tidyr::drop_na()
+# Loop through the years 1980 to 2023
+for(year in 1980:2023) {
+  # Read the CSV file for the year
+  file_path <- sprintf("../data/raw_data/NBA%d.csv", year)
+  yearly_data <- read_csv(file_path)
+  
+  # Add a year column
+  yearly_data$Year <- year
+  
+  # Combine with the main data frame
+  combined_data <- bind_rows(combined_data, yearly_data)
+}
 
-#### Save data ####
-write_csv(cleaned_data, "outputs/data/analysis_data.csv")
+# Add the number of teams to the combined data before selecting columns
+combined_data <- combined_data %>%
+  mutate(Num_Teams = case_when(
+    Year <= 1980 ~ 22,
+    Year > 1980 & Year <= 1988 ~ 23,
+    Year == 1989 ~ 25,  
+    Year > 1989 & Year <= 1995 ~ 27,
+    Year > 1995 & Year <= 2004 ~ 29,
+    TRUE ~ 30  # For years after 2004
+  ))
+
+# Now remove less important columns
+full_nba_data <- combined_data %>%
+  select(-G, -MP, -`2P`, -`2PA`, -`2P%`, -Rk)
+
+# Creating table for league average
+nba_data <- full_nba_data %>% 
+  filter(Team == "League Average")
+
+#### Saving Clean Data ####
+write.csv(nba_data, "../data/clean_data/nba_data.csv", row.names = FALSE)
+write.csv(full_nba_data, "../data/clean_data/full_nba_data.csv", row.names = FALSE)
