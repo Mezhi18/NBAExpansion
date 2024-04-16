@@ -182,7 +182,7 @@ y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 set.seed(123)  # For reproducibility
 sim_nba_data <- data.frame(
   Year = rep(1980:2023, times = 10),  # Simulate 10 records per year
-  Num_teams = c(rep(22, each = 1 * 10),
+  Num_Teams = c(rep(22, each = 1 * 10),
                 rep(23, each = 8 * 10),
                 rep(25, each = 1 * 10),
                 rep(27, each = 6 * 10),
@@ -197,8 +197,8 @@ sim_nba_data <- data.frame(
 )
 
 # Fit a multiple linear regression model
-nba_model <- lm(PTS ~ Year * Num_teams^2 + AST^2 + TRB^2 + STL + BLK + TOV, data = sim_nba_data)
-model_ny <- lm(PTS ~ Num_teams + AST + TRB + STL + BLK + TOV, data = sim_nba_data)
+nba_model <- lm(PTS ~ Year * Num_Teams^2 + AST^2 + TRB^2 + STL + BLK + TOV, data = sim_nba_data)
+model_ny <- lm(PTS ~ Num_Teams + AST + TRB + STL + BLK + TOV, data = nba_data)
 
 # Summary of the linear model
 msummary(
@@ -212,7 +212,7 @@ msummary(
 ```
 
 
-```
+
 
 
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
