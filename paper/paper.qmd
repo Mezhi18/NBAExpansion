@@ -200,6 +200,7 @@ sim_nba_data <- data.frame(
 nba_model <- lm(PTS ~ Year * Num_Teams^2 + AST^2 + TRB^2 + STL + BLK + TOV, data = sim_nba_data)
 model_ny <- lm(PTS ~ Num_Teams + AST + TRB + STL + BLK + TOV, data = nba_data)
 
+plot(model_ny)
 # Summary of the linear model
 msummary(
   list(
