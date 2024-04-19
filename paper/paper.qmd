@@ -176,40 +176,24 @@ y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 #| warning: false
 #| message: false
 
-
-
-# Simulating data
-set.seed(123)  # For reproducibility
-sim_nba_data <- data.frame(
-  Year = rep(1980:2023, times = 10),  # Simulate 10 records per year
-  Num_Teams = c(rep(22, each = 1 * 10),
-                rep(23, each = 8 * 10),
-                rep(25, each = 1 * 10),
-                rep(27, each = 6 * 10),
-                rep(29, each = 9 * 10),
-                rep(30, each = 19 * 10)),  # Adjusted each parameter as needed
-  PTS = rnorm(440, mean = mean(full_nba_data$PTS), sd = sd(full_nba_data$PTS)),  
-  AST = rnorm(440, mean = mean(full_nba_data$AST), sd = sd(full_nba_data$AST)), 
-  TRB = rnorm(440, mean = mean(full_nba_data$TRB), sd = sd(full_nba_data$TRB)),  
-  STL = rnorm(440, mean = mean(full_nba_data$STL), sd = sd(full_nba_data$STL)),  
-  BLK = rnorm(440, mean = mean(full_nba_data$BLK), sd = sd(full_nba_data$BLK)),  
-  TOV = rnorm(440, mean = mean(full_nba_data$TOV), sd = sd(full_nba_data$TOV)) 
-)
-
 # Fit a multiple linear regression model
-nba_model <- lm(PTS ~ Year * Num_Teams^2 + AST^2 + TRB^2 + STL + BLK + TOV, data = sim_nba_data)
+nba_model <- lm(PTS ~ Year * Num_Teams + AST + TRB + STL + BLK + TOV, data = nba_data)
+nba_model_2 <- lm(PTS ~ Year + Num_Teams + AST + TRB + STL + BLK + TOV, data = nba_data)
 model_ny <- lm(PTS ~ Num_Teams + AST + TRB + STL + BLK + TOV, data = nba_data)
 
 plot(model_ny)
 # Summary of the linear model
 msummary(
   list(
-    "With Year" = nba_model,
-    "Without Year" = model_ny
+    "times Year" = nba_model,
+    "Without Year" = model_ny,
+    "plus year" = nba_model_2
   ),
   fmt = 2
   )
-
+summary(nba_model)
+summary(model_ny)
+summary(nba_model_2)
 ```
 
 
