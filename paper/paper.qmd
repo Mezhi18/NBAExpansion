@@ -22,6 +22,7 @@ library(tidyverse)
 library(readr)
 library(modelsummary)
 library(tinytex)
+library(lubridate)
 ```
 
 
@@ -87,6 +88,9 @@ NBA2021 <- read_csv("../data/raw_data/NBA2021.csv")
 NBA2022 <- read_csv("../data/raw_data/NBA2022.csv")
 NBA2023 <- read_csv("../data/raw_data/NBA2023.csv")
 
+lebron_data <- read_csv("../data/raw_data/NBA_Lebron_James.csv")
+scoring_data <- read.csv("../data/raw_data/All_time_Scoring.csv")
+
 ```
 
 ```{r}
@@ -122,15 +126,21 @@ combined_data <- combined_data %>%
 
 # Now remove less important columns
 full_nba_data <- combined_data %>%
-  select(-G, -MP, -`2P`, -`2PA`, -`2P%`, -Rk)
+  select(-G, -MP, -Rk)
 
 # Creating table for league average
 nba_data <- full_nba_data %>% 
   filter(Team == "League Average")
 
 # Saving Clean Data
-write.csv(nba_data, "../data/clean_data/nba_data.csv", row.names = FALSE)
-write.csv(full_nba_data, "../data/clean_data/full_nba_data.csv", row.names = FALSE)
+write.csv(nba_data, "../data/clean_data/nba_data.csv", row.names = FALSE) #Only League Averages
+write.csv(full_nba_data, "../data/clean_data/full_nba_data.csv", row.names = FALSE) #All Teams
+
+scoring_data$Date <- as.Date(scoring_data$Date)
+
+scoring_data$Year <- year(scoring_data$Date) +
+  ifelse(month(scoring_data$Date) > 8 | 
+         (month(scoring_data$Date) == 8 & day(scoring_data$Date) > 12), 1, 0)
 ```
 
 Talk more about it.
@@ -266,6 +276,44 @@ current_plot
 ```
 
 
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+ggplot(scoring_data, aes(x = Year_Modified, fill = factor(Year_Modified))) +
+  geom_histogram(stat = "count", binwidth = 1, color = "black") +
+  labs(title = "Frequency of Records by Year",
+       x = "Year",
+       y = "Count of Records",
+       fill = "Year") +
+  theme_minimal() +
+  theme(legend.position = "none")
+##
+data_1980_onwards <- scoring_data %>%
+  filter(Year_Modified >= 1980)
+
+# Create histogram for count of records per year from 1980 onwards
+ggplot(data_1980_onwards, aes(x = Year_Modified)) +
+  geom_histogram(stat = "count", bins = length(unique(data_1980_onwards$Year_Modified)), fill = "blue", color = "black") +
+  labs(title = "Count of Records per Year from 1980 Onwards",
+       x = "Year Modified",
+       y = "Count of Records") +
+  theme_minimal()
+
+##
+data_1980_60pts_plus <- scoring_data %>%
+  filter(Year_Modified >= 1980, PTS >= 60)
+
+# Create histogram for count of records per year for scores of 60 or more from 1980 onwards
+ggplot(data_1980_60pts_plus, aes(x = Year_Modified)) +
+  geom_histogram(stat = "count", bins = length(unique(data_1980_60pts_plus$Year_Modified)), fill = "red", color = "black") +
+  labs(title = "Count of Records per Year for Scores of 60+ PTS from 1980 Onwards",
+       x = "Year Modified",
+       y = "Count of Records") +
+  theme_minimal()
+```
 
 
 
