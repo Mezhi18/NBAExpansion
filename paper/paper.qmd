@@ -23,6 +23,7 @@ library(knitr)
 library(modelsummary)
 library(tinytex)
 library(lubridate)
+library(viridis)
 ```
 
 
@@ -149,17 +150,7 @@ lebron_data$Season <- as.integer(lebron_data$Season)
 
 Talk more about it.
 
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
-```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
-#| echo: false
-#| warning: false
-#| message: false
-
-
-```
 
 Talk way more about it. 
 
@@ -191,6 +182,7 @@ y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 ```{r}
 #| warning: false
 #| message: false
+#| include: false
 #| label: fig-predict
 #| fig-cap: PPG Predecition Through the 2027 Season
 
@@ -201,7 +193,7 @@ create_future_data <- function(additional_teams) {
   latest_data <- tail(nba_data, 1)
   adjustment_factor <- 1 - 0.03 * additional_teams  # Each new team reduces stats by 3%
   data.frame(
-    Year = c(2024, 2025, 2026),
+    Year = c(2025, 2026, 2027),
     Num_Teams = latest_data$Num_Teams + additional_teams,
     AST = rep(latest_data$AST * adjustment_factor, 3),
     TRB = rep(latest_data$TRB * adjustment_factor, 3),
@@ -250,36 +242,38 @@ We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use
 
 We expect a positive relationship between the size of the wings and time spent aloft. In particular...
 
-We can use maths by including latex between dollar signs, for instance $\theta$.
+
 
 
 # Results
 
-Our results are summarized in @tbl-modelresults.
+
 
 ```{r}
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
+#| label: fig-nbastats
+#| fig-cap: NBA Statistics from 1980
 
 # Reshape data from wide to long format
 nba_data_long <- nba_data %>%
   pivot_longer(cols = c(AST, TRB, PTS, STL, BLK, TOV), names_to = "Statistic", values_to = "Value")
 
-line_colors <- c("red", "green", "blue", "purple", "orange", "cyan")
+line_colors <- c("darkgreen", "mediumseagreen", "turquoise", "deepskyblue", "dodgerblue", "darkblue")
 
 exp_year <- c(1988, 1989, 1995, 2004) #Expansion Year
 
-combined_plot <- ggplot(nba_data_long, aes(x = Year, y = Value)) +
+combined_plot <- ggplot(nba_data_long, aes(x = Year, y = Value, group = Statistic)) +
   geom_point(color = "black") +  # All points in black
-  geom_smooth(method = "lm", aes(color = Statistic), se = FALSE) +  # Lines of best fit with different colors
+  geom_line(aes(color = Statistic)) +  # Connect each point with a line per statistic
   scale_color_manual(values = line_colors) +
   geom_vline(xintercept = exp_year, color = "black", linetype = "dashed") +
   facet_wrap(~Statistic, scales = "free_y") +  # Facet by statistic, with free y scales
   labs(title = "NBA Stats Over Years", x = "Year", y = "Value") +
   theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "bottom")  # Adjusted to show the legend
 
 combined_plot
 
@@ -288,9 +282,10 @@ combined_plot
 
 ```{r}
 #| echo: false
-#| eval: true
 #| warning: false
 #| message: false
+#| label: fig-newnbastats
+#| fig-cap: NBA Stats Since 2004
 
 current_nba_data_long <- nba_data %>%
   filter(Year >= 2004) %>%  # Keep only years from 2004 onwards
@@ -317,36 +312,49 @@ current_plot
 
 ggplot(scoring_data, aes(x = Year, fill = factor(Year))) +
   geom_histogram(stat = "count", binwidth = 1, color = "black") +
+  scale_fill_viridis(discrete = TRUE, option = "mako") +  # Using 'magma' for a warm color palette
   labs(title = "Frequency of Records by Year",
        x = "Year",
        y = "Count of Records",
        fill = "Year") +
   theme_minimal() +
   theme(legend.position = "none")
-##
+
+```
+
+```{r}
+
 data_1980_onwards <- scoring_data %>%
   filter(Year >= 1980)
 
-# Create histogram for count of records per year from 1980 onwards
-ggplot(data_1980_onwards, aes(x = Year)) +
-  geom_histogram(stat = "count", bins = length(unique(data_1980_onwards$Year)), fill = "blue", color = "black") +
+ggplot(data_1980_onwards, aes(x = Year, fill = as.factor(Year))) +
+  geom_histogram(stat = "count", bins = length(unique(data_1980_onwards$Year)), color = "black") +
+  scale_fill_viridis(discrete = TRUE) +  # Apply viridis color scale for discrete data
   labs(title = "Count of Records per Year from 1980 Onwards",
        x = "Year Modified",
        y = "Count of Records") +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none")
 
+
+```
+
+```{r}
 ##
-data_1980_60pts_plus <- scoring_data %>%
+data_1980_70pts_plus <- scoring_data %>%
   filter(Year >= 1980, PTS >= 70)
 
-# Create histogram for count of records per year for scores of 60 or more from 1980 onwards
-ggplot(data_1980_60pts_plus, aes(x = Year)) +
-  geom_histogram(stat = "count", bins = length(unique(data_1980_60pts_plus$Year)), fill = "red", color = "black") +
+ggplot(data_1980_70pts_plus, aes(x = Year, fill = factor(Year))) +
+  geom_histogram(stat = "count", bins = length(unique(data_1980_70pts_plus$Year)), color = "black") +
+  scale_fill_viridis_d(begin = 0.2, end = 0.8, direction = 1, option = "magma") +  # Discrete viridis scale
   labs(title = "Count of Records per Year for Scores of 70+ PTS from 1980 Onwards",
        x = "Year Modified",
        y = "Count of Records") +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
+
+
 
 ```{r}
 #| echo: false
@@ -403,7 +411,6 @@ Weaknesses and next steps should also be included.
 
 # Appendix {-}
 
-
 # Additional data details
 
 # Model details {#sec-model-details}
@@ -413,23 +420,15 @@ Weaknesses and next steps should also be included.
 #| eval: true
 #| warning: false
 #| message: false
+#| fig-cap: Linear NBA Model
+
 
 msummary(
-  list(
-    "Points Model" = nba_model
-  ),
+  list("Points Model" = nba_model),
   fmt = 2
   )
 ```
 
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-#| 
-summary(nba_model)
-```
 
 
 ## Posterior predictive check
@@ -450,5 +449,4 @@ summary(nba_model)
 
 
 # References
-
 
