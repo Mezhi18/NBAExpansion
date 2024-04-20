@@ -20,10 +20,10 @@ bibliography: references.bib
 
 library(tidyverse)
 library(knitr)
-library(readr)
 library(modelsummary)
 library(tinytex)
 library(lubridate)
+library(bibtex)
 ```
 
 
@@ -33,11 +33,10 @@ You can and should cross-reference sections and sub-sections. We use @citeR and 
 
 The remainder of this paper is structured as follows. @sec-data....
 
-
+@gebru2021datasheets
 
 # Data {#sec-data}
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
 ```{r}
 #| include: false
@@ -383,17 +382,13 @@ Weaknesses and next steps should also be included.
 
 ## Posterior predictive check
 
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
 
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
 
 
 
 ## Diagnostics
 
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
 
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
 
 
 
