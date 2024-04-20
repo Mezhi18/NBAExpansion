@@ -19,6 +19,7 @@ bibliography: references.bib
 #| message: false
 
 library(tidyverse)
+library(knitr)
 library(readr)
 library(modelsummary)
 library(tinytex)
@@ -141,6 +142,10 @@ scoring_data$Date <- as.Date(scoring_data$Date)
 scoring_data$Year <- year(scoring_data$Date) +
   ifelse(month(scoring_data$Date) > 8 | 
          (month(scoring_data$Date) == 8 & day(scoring_data$Date) > 12), 1, 0)
+
+lebron_data$Season <- as.integer(lebron_data$Season)
+
+
 ```
 
 Talk more about it.
@@ -201,7 +206,11 @@ msummary(
   ),
   fmt = 2
   )
-summary(nba_model)
+
+
+
+
+
 summary(model_ny)
 summary(nba_model_2)
 ```
@@ -282,7 +291,7 @@ current_plot
 #| warning: false
 #| message: false
 
-ggplot(scoring_data, aes(x = Year_Modified, fill = factor(Year_Modified))) +
+ggplot(scoring_data, aes(x = Year, fill = factor(Year))) +
   geom_histogram(stat = "count", binwidth = 1, color = "black") +
   labs(title = "Frequency of Records by Year",
        x = "Year",
@@ -292,11 +301,11 @@ ggplot(scoring_data, aes(x = Year_Modified, fill = factor(Year_Modified))) +
   theme(legend.position = "none")
 ##
 data_1980_onwards <- scoring_data %>%
-  filter(Year_Modified >= 1980)
+  filter(Year >= 1980)
 
 # Create histogram for count of records per year from 1980 onwards
-ggplot(data_1980_onwards, aes(x = Year_Modified)) +
-  geom_histogram(stat = "count", bins = length(unique(data_1980_onwards$Year_Modified)), fill = "blue", color = "black") +
+ggplot(data_1980_onwards, aes(x = Year)) +
+  geom_histogram(stat = "count", bins = length(unique(data_1980_onwards$Year)), fill = "blue", color = "black") +
   labs(title = "Count of Records per Year from 1980 Onwards",
        x = "Year Modified",
        y = "Count of Records") +
@@ -304,17 +313,46 @@ ggplot(data_1980_onwards, aes(x = Year_Modified)) +
 
 ##
 data_1980_60pts_plus <- scoring_data %>%
-  filter(Year_Modified >= 1980, PTS >= 60)
+  filter(Year >= 1980, PTS >= 70)
 
 # Create histogram for count of records per year for scores of 60 or more from 1980 onwards
-ggplot(data_1980_60pts_plus, aes(x = Year_Modified)) +
-  geom_histogram(stat = "count", bins = length(unique(data_1980_60pts_plus$Year_Modified)), fill = "red", color = "black") +
+ggplot(data_1980_60pts_plus, aes(x = Year)) +
+  geom_histogram(stat = "count", bins = length(unique(data_1980_60pts_plus$Year)), fill = "red", color = "black") +
   labs(title = "Count of Records per Year for Scores of 60+ PTS from 1980 Onwards",
        x = "Year Modified",
        y = "Count of Records") +
   theme_minimal()
 ```
 
+```{r}
+
+
+nba_avg_pts <- nba_data %>%
+  group_by(Year) %>%
+  summarize(Avg_PTS = mean(PTS, na.rm = TRUE))
+
+comparison_data <- lebron_data %>%
+  rename(Year = Season) %>%  # Rename Season to Year for merging
+  left_join(nba_avg_pts, by = "Year") %>%
+  mutate(Ratio = PTS / Avg_PTS)
+
+ggplot(comparison_data, aes(x = Year, y = Ratio)) +
+  geom_point(aes(color = Year), size = 3) +
+  geom_smooth(method = "lm", se = FALSE, color = "navy") +
+  labs(title = "LeBron's PTS as a Ratio to NBA Average PTS Across Seasons",
+       x = "Season",
+       y = "Ratio of LeBron's PTS to NBA Average PTS") +
+  theme_minimal()
+
+ggplot(comparison_data, aes(x = Year, y = Ratio, fill = Year)) +
+  geom_bar(stat = "identity", color = "black") +
+  labs(title = "LeBron's PTS as a Ratio to NBA Average PTS Across Seasons (Bar Graph)",
+       x = "Season",
+       y = "Ratio of LeBron's PTS to NBA Average PTS") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
 
 
 
