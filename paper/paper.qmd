@@ -287,14 +287,19 @@ We believe the is rather accurate when considering our historical data as we hav
 
 # Results
 
-## Results 1
-rr
+In the following section we will be looking at statistics since the 1979-80 NBA season. In particular we will be looking at points, rebounds, assists, steals, blocks, and turnovers. We will be analyzing how they have changed over the years in between expansions an particularly since the last NBA expansion in 2004.
+
+## Per Game Stats Since 1980
+
+Since the 1979-80 NBA season there have been four expansions. The first, in 1980 when the Dallas Mavericks entered the league as the 23rd team. The subsequent expansion was in 1988 when the Charlotte Hornets(now New Orleans Pelicans) and the Miami Heat entered the league as the 24th and 25th teams. The following year in 1989, The Minnesota Timberwolves and The Orlando Magic brought the total up to 27 teams. Next, the Canadian expansion in 1995, the Toronto Raptors and the Vancouver Grizzlies(now Memphis Grizzlies) were created and there were 29 teams. Lastly, the most recent expansion the Charlotte Bobcats(now Charlotte Hornets) were inducted into the league. This means it has been two decades since the last time a team was added into the NBA an the so called 'Modern Expansion' era concluded.
+
+
 ```{r}
 #| echo: false
 #| warning: false
 #| message: false
 #| label: fig-nbastats
-#| fig-cap: NBA Statistics from 1980
+#| fig-cap: NBA Statistics since 1980
 #| fig-pos: 'H'
 
 # Reshape data from wide to long format
@@ -319,7 +324,9 @@ combined_plot
 
 ```
 
-### resulstss
+In @fig-nbastats we see the graphs of the previously mentioned statistics every year since 1980. The dashed vertical lines represent every year there was an expansion. We noticed that nearly all the statistics would drop after an expansion year. Indicating that our model likely made a correct prediction. While we look at steals and turnovers, which are highly related statistics have been trending on somewhat of a decline since 1980, indicating that either open court defense has gotten weaker over time or ball handling has gotten progressively better. In either scenario we must recall that the NBA is a source of entertainment th needs to generate money and while fans love offenses, better defenders would create a more competitive and therefore entertaining game. Lastly, if we look at points and assists in @fig-nbastats they seem to have a 'U' shape staring rather high in the 1980s taking a dive in the 1990s and early 2000s and coming back to a similar level in the modern NBA. Rebounds have a somewhat similar shape with a significant spike in the early 2000s.
+
+## Per Game Stats Since 2004
 rrr
 ```{r}
 #| echo: false
