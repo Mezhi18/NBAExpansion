@@ -25,7 +25,6 @@ library(tinytex)
 library(lubridate)
 library(viridis)
 library(gt)
-library(arrow)
 ```
 
 
@@ -289,13 +288,14 @@ We believe the is rather accurate when considering our historical data as we hav
 # Results
 
 ## Results 1
-
+rr
 ```{r}
 #| echo: false
 #| warning: false
 #| message: false
 #| label: fig-nbastats
 #| fig-cap: NBA Statistics from 1980
+#| fig-pos: 'H'
 
 # Reshape data from wide to long format
 nba_data_long <- nba_data %>%
@@ -320,13 +320,14 @@ combined_plot
 ```
 
 ### resulstss
-
+rrr
 ```{r}
 #| echo: false
 #| warning: false
 #| message: false
 #| label: fig-newnbastats
 #| fig-cap: NBA Stats Since 2004
+#| fig-pos: 'H'
 
 current_nba_data_long <- nba_data %>%
   filter(Year >= 2004) %>%  
@@ -345,13 +346,14 @@ current_plot
 ```
 
 # Discussion
-
+rrrrr
 ```{r}
 #| echo: false
 #| warning: false
 #| message: false
 #| label: fig-scoringgraph
 #| fig-cap: High Scoring games(59+ pts)
+#| fig-pos: 'H'
 
 
 ggplot(scoring_data, aes(x = Year, fill = factor(Year))) +
@@ -366,12 +368,15 @@ ggplot(scoring_data, aes(x = Year, fill = factor(Year))) +
 
 ```
 
+rrrrr
+
 ```{r}
 #| echo: false
 #| warning: false
 #| message: false
 #| label: fig-scoringgraph1980
 #| fig-cap: High Scoring games(59+ pts) Since 1980
+#| fig-pos: 'H'
 
 
 data_1980_onwards <- scoring_data %>%
@@ -398,6 +403,7 @@ hhh
 #| message: false
 #| label: fig-scoringgraph70
 #| fig-cap: High Scoring games(70+ pts) Since 1980
+#| fig-pos: 'H'
 
 
 data_1980_70pts_plus <- scoring_data %>%
@@ -421,6 +427,7 @@ hhh
 #| message: false
 #| label: fig-lebronbar
 #| fig-cap: Lebrons PPG as a Ratio of the League Average
+#| fig-pos: 'H'
 
 nba_avg_pts <- nba_data %>%
   group_by(Year) %>%
@@ -450,6 +457,7 @@ hhh
 #| message: false
 #| label: fig-lebronarea
 #| fig-cap: League Average PPG vs Lebrons PPG
+#| fig-pos: 'H'
 
 
 # Calculate average points per season for the NBA
@@ -513,6 +521,7 @@ Weaknesses and next steps should also be included.
 #| warning: false
 #| message: false
 #| fig-cap: Linear NBA Model
+#| fig-pos: 'H'
 
 modelsummary(
   list("Points Model" = nba_model),
