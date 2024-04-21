@@ -22,3 +22,5 @@ The repo is structured as:
 ## Statement on LLM usage
 
 Aspects of the code were written with the help of Chat GPT and GPT-4 the link to the chat will be here:
+https://chat.openai.com/g/g-TgjKDuQwZ-r-wizard/c/3afbc5ed-df77-4253-b6c5-8f85ec3e3990
+

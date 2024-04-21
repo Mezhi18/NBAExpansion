@@ -25,6 +25,7 @@ library(tinytex)
 library(lubridate)
 library(viridis)
 library(gt)
+library(arrow)
 ```
 
 
@@ -40,11 +41,13 @@ The remainder of this paper is structured as follows. @sec-data....
 
 The data for this research paper was gathered from @bbref, a subsection of Sports Reference LLC. Sports Reference hosts many other subsections such as Baseball, Football, Soccer, and several college sports. From @bbref, we have access to extensive data, including individual player statistics, playoffs, and direct comparisons on the website.
 
-The first data set includes the season summary from 1980 to 2024, this past season. From the specific table where the data was gathered, the per-game stats of each team by year are listed, along with percentages and the league average for the year, which we will focus on from this data set. Some of the variables included in this data set are points, assists, personal fouls, 3-point percentage, and several more. The main focus of the data set was points, assists, turnovers, blocks, steals, and total rebounds (the option was available to divide total rebounds into offensive and defensive rebounds per game). As these summaries are on the website in individual links, they needed to be individually downloaded and combined in @citeR. While it was a tedious process, the retrieval of data was done carefully and meticulously. In regards to cleaning this data set, other than combining all data sets, the year needed to be added for each season so that they would be distinguishable from one another. As the NBA season is played through two calendar years for simplicity, the decision was made to assign the calendar year in which the playoffs of that season were played (e.g., the 1999-2000 NBA Season was saved under the year 2000). From here, we created another data set solely focused on the league average of every NBA season.
+The first data set includes the season summary from 1980 to 2024, this past season. From the specific table where the data was gathered, the per-game stats of each team by year are listed, along with percentages and the league average for the year, which we will focus on from this data set. Some of the variables included in this data set are points, assists, personal fouls, 3-point percentage, and several more. The main focus of the data set was points, assists, turnovers, blocks, steals, and total rebounds (the option was available to divide total rebounds into offensive and defensive rebounds per game). As these summaries are on the website in individual links, they needed to be individually downloaded and combined in @citeR. While it was a tedious process, the retrieval of data was done carefully and meticulously. In regards to cleaning this data set, other than combining all data sets, the year needed to be added for each season so that they would be distinguishable from one another. As the NBA season is played through two calendar years for simplicity, the decision was made to assign the calendar year in which the playoffs of that season were played (e.g., the 1999-2000 NBA Season was saved under the year 2000).Next, we added an additional column that gave us the amount of teams there were in each season as that colum did not exists in the original data set. From here, we created another data set solely focused on the league average of every NBA season. This data set was selected for many reasons, other than the fact that it contains the most important statistics such as points, assists, and rebounds as stated before, but it also includes some less used statistics that can be used to analyze the NBA.
 
 The next data set includes some of the highest scoring games in NBA history. The @bbref link from which this data was gathered had a cutoff of 59 points in a game, so all the games recorded in this data set are from times when a player scored 59 points or more. In contrast to the previous data set, as these games were played on a single date, we do have the exact year they were played, but for consistency, the new date was again based on the year in which the playoffs were played, so even if the game was played in the fall of 2022 of the 2022-2023 NBA season, the year was saved as 2023. This needed to be carefully done as the postponement of the 2019-2020 NBA season due to the global pandemic, COVID-19, required a carefully chosen date for some of the games so that they would not accidentally fall in the range of the wrong season.
 
 Lastly, we have the data set which is a summary of LeBron James' career. For this data set, very little cleaning was needed as @bbref creates rather useful data tables. The reason this data was chosen, aside from the fact that LeBron is one of the greatest players in the history of basketball, he entered the league around the time of its expansion and is still an active NBA player, making him not only the perfect choice but the only logical one as well.
+
+As stated before the the data retrieved from @bbref was already rather clean, and for the sake of reproducibility and further updates on this topic and paper, it was decided to leave most of the unused stats within the clean data even if it was not used at this time.
 
 ```{r}
 #| include: false
@@ -107,6 +110,7 @@ scoring_data <- read.csv("../data/raw_data/All_time_Scoring.csv")
 #| include: false
 #| warning: false
 #| message: false
+#| echo: false
 
 combined_data <- data.frame()
 
@@ -143,8 +147,8 @@ nba_data <- full_nba_data %>%
   filter(Team == "League Average")
 
 # Saving Clean Data
-write.csv(nba_data, "../data/clean_data/nba_data.csv", row.names = FALSE) #Only League Averages
-write.csv(full_nba_data, "../data/clean_data/full_nba_data.csv", row.names = FALSE) #All Teams
+write.csv(nba_data, "../data/clean_data/nba_data.csv") #Only League Averages
+write.csv(full_nba_data, "../data/clean_data/full_nba_data.csv") #All Teams
 
 scoring_data$Date <- as.Date(scoring_data$Date)
 
@@ -154,6 +158,9 @@ scoring_data$Year <- year(scoring_data$Date) +
 
 lebron_data$Season <- as.integer(lebron_data$Season)
 
+write.csv(lebron_data, "../data/clean_data/clean_lebron_data.csv")
+
+write.csv(scoring_data, "../data/clean_data/clean_scoring_data.csv")
 
 ```
 
@@ -216,9 +223,9 @@ predict_points <- function(data, scenario_name) {
 }
 
 # Generate predictions for each scenario
-predictions_no_new_teams <- predict_points(data_no_new_teams, "30 Teams")
-predictions_one_new_team <- predict_points(data_one_new_team, "31 Teams")
-predictions_two_new_teams <- predict_points(data_two_new_teams, "32 Teams")
+predictions_no_new_teams <- predict_points(data_no_new_teams, "30")
+predictions_one_new_team <- predict_points(data_one_new_team, "31")
+predictions_two_new_teams <- predict_points(data_two_new_teams, "32")
 
 # Combine predictions into a single data frame
 all_predictions <- bind_rows(predictions_no_new_teams, predictions_one_new_team, predictions_two_new_teams)
@@ -240,8 +247,27 @@ pred_table <- gt(wide_predictions) %>%
     ),
     locations = cells_column_labels(columns = everything())
   )
+summary(nba_model)
 
 ```
+
+We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
+
+
+### Model justification
+
+#### Positive Relationship
+
+We expect a positive relationship between the points per game the statistics above: assists, rebounds, steals, blocks. The higher these variables are the higher points per game should be. While some seem directly correlated to points such as assists, as points need to be scored for an assist to be recorded, other such as rebounds and defensive statistics, i.e. blocks and steals may not see to be directly correlated to points but they in fact are as from blocks and steals often point scoring opportunity are created as well as rebounds.
+
+#### Negative Relationship
+
+While for the previous variables we expect a positive relationship for number of teams and turnovers we expect a negative relationship, as of course turnovers would represent a point scoring opportunity lost, and the number of teams, the variable we will be focusing on, represent the dilution of talent per team as there would need to be a NBA expansion draft and team would lose some talent and the average team would be overall worse.
+
+
+## Model Prediction
+
+Taking the variables from the previous Season we will look to predict the average points per game of the NBA over the next three years. This will include no change in teams an additional team and two additional teams added to the NBA for the 2024-2025 NBA season. @fig-predict will have the predicted data for the following three years.
 
 ```{r}
 #| message: false
@@ -254,26 +280,18 @@ pred_table
 
 ```
 
+As we can see in @fig-predict the points per game drops as the the number of teams increases and the points per game increases every year as predicted. This shows us that the number of teams will in fact affect the points scored but as players get used to the new NBA and more talent enters the league through the draft and free agency(for those un-drafted and/or entering the league at an older age) the points per game will continue to rise again, or in the case of no teams being added the points per game will just rise. 
 
-
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
+We believe the is rather accurate when considering our historical data as we have  relatively high $R^2$ value at $R^2 = 0.961$. Other such details can be found in @sec-model-details in the appendix.
 
 
 
 # Results
 
-
+## Results 1
 
 ```{r}
 #| echo: false
-#| eval: true
 #| warning: false
 #| message: false
 #| label: fig-nbastats
@@ -301,6 +319,7 @@ combined_plot
 
 ```
 
+### resulstss
 
 ```{r}
 #| echo: false
@@ -325,6 +344,7 @@ current_plot <- ggplot(current_nba_data_long, aes(x = Year, y = Value)) +
 current_plot
 ```
 
+# Discussion
 
 ```{r}
 #| echo: false
@@ -369,6 +389,9 @@ ggplot(data_1980_onwards, aes(x = Year, fill = as.factor(Year))) +
 
 ```
 
+
+hhh
+
 ```{r}
 #| echo: false
 #| warning: false
@@ -390,7 +413,7 @@ ggplot(data_1980_70pts_plus, aes(x = Year, fill = factor(Year))) +
   theme(legend.position = "none")
 ```
 
-
+hhh
 
 ```{r}
 #| echo: false
@@ -418,7 +441,7 @@ ggplot(comparison_data, aes(x = Year, y = Ratio, fill = Year)) +
 
 ```
 
-
+hhh
 
 ```{r}
 #| echo: false
@@ -458,10 +481,10 @@ ggplot(comparison_data, aes(x = Year)) +
                     name = "Legend")
 ```
 
+rselts
 
 
-# Discussion
-
+discussions
 ## First discussion point {#sec-first-point}
 
 If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
