@@ -24,6 +24,7 @@ library(modelsummary)
 library(tinytex)
 library(lubridate)
 library(viridis)
+library(kableExtra)
 ```
 
 
@@ -158,9 +159,9 @@ Talk way more about it.
 
 # Model
 
-The goal of our modelling strategy is twofold. Firstly,...
+The goal of our modelling strategy is twofold. Firstly, I want to analyze what how much other basic statistics such as assists and rebounds have on PPG as well as the affect the number of teams in the league in comparison with the year have on the same points per game. Next, I would like to predict the PPG of the next three seasons depending on the number of teams that are in the league. Considering the NBA would likely expand only one team at a time we will be focusing on the potential PPG over the next three years with 30 teams, 31 teams, and 32 teams. 
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
+Here we briefly describe the Bayesian analysis model used to investigate the multiple linear regression model of PPG as described below.
 
 ## Model set-up
 
@@ -228,7 +229,6 @@ wide_predictions <- all_predictions %>%
 # Print the reshaped data frame
 wide_predictions
 
-
 ```
 
 
@@ -288,17 +288,17 @@ combined_plot
 #| fig-cap: NBA Stats Since 2004
 
 current_nba_data_long <- nba_data %>%
-  filter(Year >= 2004) %>%  # Keep only years from 2004 onwards
+  filter(Year >= 2004) %>%  
   pivot_longer(cols = c(AST, TRB, PTS, STL, BLK, TOV), names_to = "Statistic", values_to = "Value")
 
 current_plot <- ggplot(current_nba_data_long, aes(x = Year, y = Value)) +
-  geom_point(color = "black") +  # All points in black
-  geom_smooth(method = "lm", aes(color = Statistic), se = FALSE) +  # Lines of best fit with different colors
+  geom_point(color = "black") +  
+  geom_line(aes(color = Statistic)) + 
   scale_color_manual(values = line_colors) +
-  facet_wrap(~Statistic, scales = "free_y") +  # Facet by statistic, with free y scales
-  labs(title = "NBA Stats Over Years (Post-2004)", x = "Year", y = "Value") +
+  facet_wrap(~Statistic, scales = "free_y") +  
+  labs(title = "NBA Stats Over Years (Post-2004)", x = "Year", y = "Quantity") +
   theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "bottom")
 
 current_plot
 ```
@@ -306,16 +306,18 @@ current_plot
 
 ```{r}
 #| echo: false
-#| eval: true
 #| warning: false
 #| message: false
+#| label: fig-scoringgraph
+#| fig-cap: High Scoring games(59+ pts)
+
 
 ggplot(scoring_data, aes(x = Year, fill = factor(Year))) +
   geom_histogram(stat = "count", binwidth = 1, color = "black") +
   scale_fill_viridis(discrete = TRUE, option = "mako") +  # Using 'magma' for a warm color palette
-  labs(title = "Frequency of Records by Year",
+  labs(title = "Count of 59+ Point Games",
        x = "Year",
-       y = "Count of Records",
+       y = "Count of Games",
        fill = "Year") +
   theme_minimal() +
   theme(legend.position = "none")
@@ -323,16 +325,22 @@ ggplot(scoring_data, aes(x = Year, fill = factor(Year))) +
 ```
 
 ```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: fig-scoringgraph1980
+#| fig-cap: High Scoring games(59+ pts) Since 1980
+
 
 data_1980_onwards <- scoring_data %>%
   filter(Year >= 1980)
 
 ggplot(data_1980_onwards, aes(x = Year, fill = as.factor(Year))) +
   geom_histogram(stat = "count", bins = length(unique(data_1980_onwards$Year)), color = "black") +
-  scale_fill_viridis(discrete = TRUE) +  # Apply viridis color scale for discrete data
-  labs(title = "Count of Records per Year from 1980 Onwards",
+  scale_fill_viridis(discrete = TRUE) +  
+  labs(title = "Count of 59+ Point Games since 1980",
        x = "Year Modified",
-       y = "Count of Records") +
+       y = "Count of Games") +
   theme_minimal() +
   theme(legend.position = "none")
 
@@ -340,16 +348,22 @@ ggplot(data_1980_onwards, aes(x = Year, fill = as.factor(Year))) +
 ```
 
 ```{r}
-##
+#| echo: false
+#| warning: false
+#| message: false
+#| label: fig-scoringgraph70
+#| fig-cap: High Scoring games(70+ pts) Since 1980
+
+
 data_1980_70pts_plus <- scoring_data %>%
   filter(Year >= 1980, PTS >= 70)
 
 ggplot(data_1980_70pts_plus, aes(x = Year, fill = factor(Year))) +
   geom_histogram(stat = "count", bins = length(unique(data_1980_70pts_plus$Year)), color = "black") +
   scale_fill_viridis_d(begin = 0.2, end = 0.8, direction = 1, option = "magma") +  # Discrete viridis scale
-  labs(title = "Count of Records per Year for Scores of 70+ PTS from 1980 Onwards",
+  labs(title = "Count of 70+ Point Games since 1980",
        x = "Year Modified",
-       y = "Count of Records") +
+       y = "Count of Games") +
   theme_minimal() +
   theme(legend.position = "none")
 ```
@@ -361,6 +375,8 @@ ggplot(data_1980_70pts_plus, aes(x = Year, fill = factor(Year))) +
 #| eval: true
 #| warning: false
 #| message: false
+#| label: fig-lebronbar
+#| fig-cap: Lebrons PPG as a Ratio of the League Average
 
 nba_avg_pts <- nba_data %>%
   group_by(Year) %>%
@@ -371,22 +387,54 @@ comparison_data <- lebron_data %>%
   left_join(nba_avg_pts, by = "Year") %>%
   mutate(Ratio = PTS / Avg_PTS)
 
-ggplot(comparison_data, aes(x = Year, y = Ratio)) +
-  geom_point(aes(color = Year), size = 3) +
-  geom_smooth(method = "lm", se = FALSE, color = "navy") +
-  labs(title = "LeBron's PTS as a Ratio to NBA Average PTS Across Seasons",
-       x = "Season",
-       y = "Ratio of LeBron's PTS to NBA Average PTS") +
-  theme_minimal()
-
 ggplot(comparison_data, aes(x = Year, y = Ratio, fill = Year)) +
   geom_bar(stat = "identity", color = "black") +
-  labs(title = "LeBron's PTS as a Ratio to NBA Average PTS Across Seasons (Bar Graph)",
-       x = "Season",
+  labs(title = "LeBron's PTS as a Ratio to NBA Average PTS Across Seasons",
+       x = "Year",
        y = "Ratio of LeBron's PTS to NBA Average PTS") +
   theme_minimal() +
   theme(legend.position = "none")
 
+```
+
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+#| label: fig-lebronarea
+#| fig-cap: League Average PPG vs Lebrons PPG
+
+
+# Calculate average points per season for the NBA
+nba_avg_pts <- nba_data %>%
+  group_by(Year) %>%
+  summarize(Avg_PTS = mean(PTS, na.rm = TRUE))
+
+fa_year <- c(2010, 2014, 2018)
+
+# Prepare comparison data by joining LeBron's data with NBA average points
+comparison_data <- lebron_data %>%
+  rename(Year = Season) %>%
+  left_join(nba_avg_pts, by = "Year")
+
+# Create an area graph for LeBron's points and NBA average points
+ggplot(comparison_data, aes(x = Year)) +
+  geom_area(aes(y = Avg_PTS), fill = "blue",alpha = 0.5, color = "navy") +
+  geom_area(aes(y = PTS), fill = "maroon", alpha = 0.8, color = "darkred" ) +
+  labs(title = "Comparison of LeBron's PTS vs. NBA Average PTS Across Seasons",
+       x = "Season",
+       y = "Points") +
+  geom_vline(xintercept = fa_year, color = "black", linetype = "dashed") +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12)) +
+  scale_fill_manual(values = c("blue", "maroon"),
+                    labels = c("NBA Avg PTS", "LeBron PTS"),
+                    name = "Legend")
 ```
 
 
@@ -422,8 +470,7 @@ Weaknesses and next steps should also be included.
 #| message: false
 #| fig-cap: Linear NBA Model
 
-
-msummary(
+modelsummary(
   list("Points Model" = nba_model),
   fmt = 2
   )
