@@ -6,7 +6,7 @@ author:
 thanks: "Code and data are available at: https://github.com/Mezhi18/NBAExpansion ."
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "The NBA has not had an expansion in two decades. Using Data from the NBA and Basketball Reference we will investigate whether the NBA Should follow it's peer the NHL and consider expanding, we will use multi-linear regression to and other methods of statistical analysis to determine if the NBA should expand. Results show that the NBA has had their point per game increase a drastic amount in two decades and will continue to do so without an intervention. We can conclude the the NBA should strongly consider expanding and adding a new team the the beautiful game of Basketball."
 format: pdf
 toc: true
 number-sections: true
@@ -30,11 +30,14 @@ library(gt)
 
 # Introduction
 
-You can and should cross-reference sections and sub-sections. We use @citeR and @rohan.
+In this paper we will be asking answering the question of whether it is time for an NBA expansion. We focused on data sets spanning from 1980 to 2024, featuring per-game statistics that serve as a foundation for our analyses. By examining variables such as points, assists, and rebounds, along with less common metrics, our research provides insights into the evolution of the NBA over nearly five decade and in some cases earlier. We also explored high-scoring games of players such as Kobe Bryant, and the impact of historical player performances, notably LeBron James, to contextualize changes in gameplay dynamics over time.
 
-The remainder of this paper is structured as follows. @sec-data....
+Utilizing @rCore software, we meticulously combined and cleaned multiple data sets to ensure a clear, continuous thread for our analysis. This effort included assigning specific years to seasons based on playoff schedules, even during irregular seasons like the COVID-19 impacted 2019-2020 session. Moreover, we introduced new columns to better distinguish between different seasons and team expansions, enhancing our dataset’s granularity and usefulness for predictive modeling. We will be using points per game as our estimand.
 
-@gebru2021datasheets
+The resulting study not only revisits historical NBA statistics but also employs advanced statistical models to forecast future trends based on team expansion scenarios. Our predictive analysis seeks to understand the interplay between the number of teams and per-game scoring averages, providing a nuanced view of potential future league expansions. This research is pivotal for stakeholders interested in the strategic implications of NBA expansion and its influence on the game’s competitive landscape.
+
+We use @citeR, @rohan, @tidyverse, @knitr, @modelsummary, @tinytex, @lubridate, @viridis, and @gt.
+
 
 # Data {#sec-data}
 
@@ -157,6 +160,16 @@ scoring_data$Year <- year(scoring_data$Date) +
 
 lebron_data$Season <- as.integer(lebron_data$Season)
 
+#adding rank to empty cells
+scoring_data <- scoring_data %>%
+  mutate(
+    Rank = if_else(
+      is.na(Rank),  
+      dense_rank(desc(PTS)),  
+      Rank  
+    )
+  )
+
 write.csv(lebron_data, "../data/clean_data/clean_lebron_data.csv")
 
 write.csv(scoring_data, "../data/clean_data/clean_scoring_data.csv")
@@ -266,22 +279,22 @@ While for the previous variables we expect a positive relationship for number of
 
 ## Model Prediction
 
-Taking the variables from the previous Season we will look to predict the average points per game of the NBA over the next three years. This will include no change in teams an additional team and two additional teams added to the NBA for the 2024-2025 NBA season. @fig-predict will have the predicted data for the following three years.
+Taking the variables from the previous Season we will look to predict the average points per game of the NBA over the next three years. This will include no change in teams an additional team and two additional teams added to the NBA for the 2024-2025 NBA season. @tbl-predict will have the predicted data for the following three years.
 
 ```{r}
 #| message: false
 #| echo: false
 #| warning: false
-#| label: fig-predict
+#| label: tbl-predict
 #| fig-cap: PPG Predecition Through the 2027 Season
 
 pred_table
 
 ```
 
-As we can see in @fig-predict the points per game drops as the the number of teams increases and the points per game increases every year as predicted. This shows us that the number of teams will in fact affect the points scored but as players get used to the new NBA and more talent enters the league through the draft and free agency(for those un-drafted and/or entering the league at an older age) the points per game will continue to rise again, or in the case of no teams being added the points per game will just rise. 
+As we can see in @tbl-predict the points per game drops as the the number of teams increases and the points per game increases every year as predicted. This shows us that the number of teams will in fact affect the points scored but as players get used to the new NBA and more talent enters the league through the draft and free agency(for those un-drafted and/or entering the league at an older age) the points per game will continue to rise again, or in the case of no teams being added the points per game will just rise. 
 
-We believe the is rather accurate when considering our historical data as we have  relatively high $R^2$ value at $R^2 = 0.961$. Other such details can be found in @sec-model-details in the appendix.
+We believe the is rather accurate when considering our historical data as we have  relatively high $R^2$ value at $R^2 = 0.961$. Other such details can be found in @sec-model-details of the appendix.
 
 
 
@@ -324,10 +337,13 @@ combined_plot
 
 ```
 
-In @fig-nbastats we see the graphs of the previously mentioned statistics every year since 1980. The dashed vertical lines represent every year there was an expansion. We noticed that nearly all the statistics would drop after an expansion year. Indicating that our model likely made a correct prediction. While we look at steals and turnovers, which are highly related statistics have been trending on somewhat of a decline since 1980, indicating that either open court defense has gotten weaker over time or ball handling has gotten progressively better. In either scenario we must recall that the NBA is a source of entertainment th needs to generate money and while fans love offenses, better defenders would create a more competitive and therefore entertaining game. Lastly, if we look at points and assists in @fig-nbastats they seem to have a 'U' shape staring rather high in the 1980s taking a dive in the 1990s and early 2000s and coming back to a similar level in the modern NBA. Rebounds have a somewhat similar shape with a significant spike in the early 2000s.
+In @fig-nbastats we see the graphs of the previously mentioned statistics every year from 1980. The dashed vertical lines represent every year there was an expansion. We noticed that nearly all the statistics would drop after an expansion year. Indicating that our model likely made a correct prediction. While we look at steals and turnovers, which are highly related statistics have been trending on somewhat of a decline since 1980, indicating that either open court defense has gotten weaker over time or ball handling has gotten progressively better. In either scenario we must recall that the NBA is a source of entertainment th needs to generate money and while fans love offenses, better defenders would create a more competitive and therefore entertaining game. Lastly, if we look at points and assists in @fig-nbastats they seem to have a 'U' shape starting rather high in the 1980s taking a dive in the 1990s and early 2000s and coming back to a similar level in the modern NBA. Rebounds have a somewhat similar shape with a significant spike in the early 2000s.
 
 ## Per Game Stats Since 2004
-rrr
+
+In our next graph, @fig-newnbastats, we will be looking at the same graphs only after 2004, the most recent expansion.
+
+
 ```{r}
 #| echo: false
 #| warning: false
@@ -352,8 +368,19 @@ current_plot <- ggplot(current_nba_data_long, aes(x = Year, y = Value)) +
 current_plot
 ```
 
+While blocks and steals don't seem to have particularly strong trend in @fig-newnbastats,steals are staying rather steady between 7.2 and 7.8 steals per game while blocks seem to be oscilating between 4.6 and 5.1 blocks per game. Points, assists and rebounds all seem to have a strong upwards trend over the past 20 years with some variation from year to year. With points rising from below 100 points per game to a monstrous 115 points per game in the span of twenty years and no expansions. When we compare this to @fig-nbastats we can see especially how this compares to the late 1990s and the early 2000s.
+
+From @fig-newnbastats and our model @tbl-predict we have no reason to believe that any of these statistical categories show any sign of stopping in the foreseeable future.
+
+
 # Discussion
-rrrrr
+
+## High Scoring Games
+
+In the following three graphs, @fig-scoringgraph, @fig-scoring1980, and @fig-scoring70, we will be taking a look at the occurrences of some of the highest scoring games of all time.
+
+### High Scoring Games (All-Time)
+
 ```{r}
 #| echo: false
 #| warning: false
@@ -375,13 +402,15 @@ ggplot(scoring_data, aes(x = Year, fill = factor(Year))) +
 
 ```
 
-rrrrr
+While, @fig-scoringgraph is not incredibly relevant in the context of considering an NBA expansion in the 2020s it brings into context how much more common incredibly high scoring game were in the early days of the NBA, where we can see that massive spike around the 1960 where one year, 1962, there were more than 59+ point game within a single season. Now when we look to the 2020s we can see the number of high scoring games rise again.
+
+### High Scoring Games (Since 1980)
 
 ```{r}
 #| echo: false
 #| warning: false
 #| message: false
-#| label: fig-scoringgraph1980
+#| label: fig-scoring1980
 #| fig-cap: High Scoring games(59+ pts) Since 1980
 #| fig-pos: 'H'
 
@@ -392,7 +421,7 @@ data_1980_onwards <- scoring_data %>%
 ggplot(data_1980_onwards, aes(x = Year, fill = as.factor(Year))) +
   geom_histogram(stat = "count", bins = length(unique(data_1980_onwards$Year)), color = "black") +
   scale_fill_viridis(discrete = TRUE) +  
-  labs(title = "Count of 59+ Point Games since 1980",
+  labs(title = "Count of 59+ Point Games Since 1980",
        x = "Year Modified",
        y = "Count of Games") +
   theme_minimal() +
@@ -401,14 +430,17 @@ ggplot(data_1980_onwards, aes(x = Year, fill = as.factor(Year))) +
 
 ```
 
+@fig-scoring1980 and @fig-scoringgraph are quite similar, but @fig-scoring1980 focused on the NBA since 1980 as our data set in @fig-nbastats was focused on the same years. This graph puts into perspective how many high scoring games have been played in the passed ten years when we bring in the greater context of looking at the 45 history from the beginning of the expansion era til now. High scoring games have become so much more common in the last ten years they have lost some but not all of their significance. From a time when only a handful ina generation type of player could produce such an incredible accomplishment, these games have become rare but not out of the ordinary.
 
-hhh
+### Kobe's 81-Point Game
+
+Kobe Bryant, a Hall of Fame player who's career spanned from 1996-2016 set a record for 2nd most points to ever be scored in a game and the most point scored in game in the modern NBA.
 
 ```{r}
 #| echo: false
 #| warning: false
 #| message: false
-#| label: fig-scoringgraph70
+#| label: fig-scoring70
 #| fig-cap: High Scoring games(70+ pts) Since 1980
 #| fig-pos: 'H'
 
@@ -419,14 +451,23 @@ data_1980_70pts_plus <- scoring_data %>%
 ggplot(data_1980_70pts_plus, aes(x = Year, fill = factor(Year))) +
   geom_histogram(stat = "count", bins = length(unique(data_1980_70pts_plus$Year)), color = "black") +
   scale_fill_viridis_d(begin = 0.2, end = 0.8, direction = 1, option = "magma") +  # Discrete viridis scale
-  labs(title = "Count of 70+ Point Games since 1980",
+  labs(title = "Count of 70+ Point Games Since 1980",
        x = "Year Modified",
        y = "Count of Games") +
   theme_minimal() +
   theme(legend.position = "none")
 ```
 
-hhh
+As can be seen in @fig-scoring70 since 1980 there have been a total of seven 70+ point games, five of which have been since 2010, and 4 of them have been in the past two seasons. 
+
+On January 22nd 2006, Kobe Bryant scored his infamous 81 over the Toronto Raptors. This game was so unique there hasn't been an 80+ point game before or since, barring Wilt's 100 point game. As previously mentioned, even 70 point gamed were a once in a decade occurrence until the 2020s as can be seen in @fig-scoring70. To make an additional comment on Kobe's behalf while this was a one of a kind game in his career, he did score 62 points in three quarters before refusing to play the fourth.
+
+For some context, legendary basketball player Wilt Chamberlain scored the on ever recorded 100-point game in NBA history a record that is likely never to be broken, this was in a time the the points per game were much higher ans the skill difference between the best players and the mediocre players was more than palpable. Considering these high scoring games were so incredibly rare until recently we can make the conclusion that the NBA today is vastly different than it used to be and this should be considered, one of the ways we might be able to reserve these games for generational players is to have an expansions and dilute the talent in the average NBA team. 
+
+## LeBron James vs. The NBA
+
+LeBron James is debatably the greatest player to ever play basketball and fortunately for us he has stayed relatively consistent through out his entire career and he entered the NBA as a rookie right around the time of the most recent expansion.
+
 
 ```{r}
 #| echo: false
@@ -455,7 +496,11 @@ ggplot(comparison_data, aes(x = Year, y = Ratio, fill = Year)) +
 
 ```
 
-hhh
+In @fig-lebronbar we see that when comparing his points per game to the league average points per game he has maintained a rather steady approximately 25% of the league average, especially in his older age, where we can see a mild jump in comparison to the league average. When Considering this we can see that as he maintains his points per game in comparison to the league average we can make the conclusion the the amount of points being scored is somewhat inflated, as if there were just more points being we would be able to see a more significant decline in percentage. While there is a minor gradual decrease as he ages it is also obvious he is mainlining his scoring habits showing that not only is he scoring more as the league average increases, but he is mostly maintain his points per game in comparison. So a 25 point per game season in 2024 is much less impressive than one in 2005 or even the 1990s or 1980s. In @fig-lebronarea we can make the same conclusion, where LeBron's points per game is in red and the team average points per game is blue and the vertical dashed lines represent a change in teams. 
+
+
+
+
 
 ```{r}
 #| echo: false
@@ -496,21 +541,17 @@ ggplot(comparison_data, aes(x = Year)) +
                     name = "Legend")
 ```
 
-rselts
+
+## NFL and NHL
+
+The NFL and NHL both have 32 teams, while the NFL has not had a recent expansion like the NHL it was the first out of the four major sports leagues in north america to have 32 teams. As previously mentioned, the NBA is a business and they are there first to make money, there are plenty of metropolitan areas that could be mutually beneficial to the NBA wit the expansion into a new city. Cities that don't have an NBA team yet could really benefit from one. They've got fans waiting and venues ready, making them ideal spots for the league's expansion. Adding teams there could be a smart business move, giving the NBA new sources of revenue like ticket and merchandise sales. New teams in new cities would bring in not only existing fans but new fans into the basketball community, and as a "long term investment" the more childrent hat love basketball will in turn bring more talent tot he NBA in the future.
 
 
-discussions
-## First discussion point {#sec-first-point}
+## Weaknesses and Next steps
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+When writing this paper it is important to be aware of any weaknesses in our arguments and data. While all the data is true and accurate it does not necessarily tell the full story, there are plenty other variables that could be used including advanced statistics, total statistics, per 100 possessions, and plenty more, one is unlikely to find a shortage of basketball statistics. Within the model in mind, there may have been a more fitting regression model when considering points per game, as we can see in @fig-nbastats and @fig-newnbastats not all of the statistics would be well represented with a linear regression model. As said previously the NBA is a different game than it used to be it is not just a matter of inflation of talent and there being more good players while this is true due to many factors such as increase in population, increase in popularity in the sport especially internationally outside the USA, and rule changes that make different types of players good in different eras. We can also consider the way the game is played, Stephen curry essentially revolutionized the game in the mid 2010s when the amount of three point shots being taken and made skyrockets, this is just one example of a player that changes the game in its long history.Lastly, when mentioning how an expansion could be economically beneficial, we fail to mention to which cities would be best, and make a recommendation for the best choice or two for the NBA expansion as it would require much more research and data analysis. 
 
-## Second discussion point
-
-## Third discussion point
-
-## Weaknesses and next steps
-
-Weaknesses and next steps should also be included.
+The next steps, would be to continue monitoring the NBA in the following years and updating our data sets as more seasons pass, in addition doing more research into more complex models that could represent the NBA points per game even more accurately than were able to achieve. Lastly, we would look into more complex and arbitrary variables that could make further interesting remarks about the NBA. Finally, further research into which cities would make the best new location to host an NBA expansion Team.
 
 \newpage
 
@@ -519,6 +560,22 @@ Weaknesses and next steps should also be included.
 # Appendix {-}
 
 # Additional data details
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+#| label: fig-scoringtable
+#| fig-cap: Top 15 Scoring Games
+#| fig-pos: 'H'
+
+scoring_data %>%
+  slice_head(n = 15) %>%
+  gt()
+
+```
+
 
 # Model details {#sec-model-details}
 
@@ -534,18 +591,9 @@ modelsummary(
   list("Points Model" = nba_model),
   fmt = 2
   )
+
+saveRDS(nba_model,"../models/nba_model.rds")
 ```
-
-
-
-## Posterior predictive check
-
-
-
-
-
-## Diagnostics
-
 
 
 

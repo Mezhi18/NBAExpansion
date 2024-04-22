@@ -6,6 +6,9 @@ In this paper we will be investigating whether the NBA should be looking to expa
 
 Is it time for an NBA Expansion?
 
+## Abstract
+
+The NBA has not had an expansion in two decades. Using Data from the NBA and Basketball Reference we will investigate whether the NBA Should follow it's peer the NHL and consider expanding, we will use multi-linear regression to and other methods of statistical analysis to determine if the NBA should expand. Results show that the NBA has had their point per game increase a drastic amount in two decades and will continue to do so without an intervention. We can conclude the the NBA should strongly consider expanding and adding a new team the the beautiful game of Basketball.
 
 ## File Structure
 
@@ -23,4 +26,8 @@ The repo is structured as:
 
 Aspects of the code were written with the help of Chat GPT and GPT-4 the link to the chat will be here:
 https://chat.openai.com/g/g-TgjKDuQwZ-r-wizard/c/3afbc5ed-df77-4253-b6c5-8f85ec3e3990
+
+## Data Collection
+
+The process of data collection from Basketball Reference was a rather odd and tedious process as for every table needed to copy and pasted into excel before being converted to a .csv file that could read by R. The instructions can be found in the following Link
 
