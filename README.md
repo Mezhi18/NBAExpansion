@@ -8,7 +8,7 @@ Is it time for an NBA Expansion?
 
 ## Abstract
 
-The NBA has not had an expansion in two decades. Using Data from the NBA and Basketball Reference we will investigate whether the NBA Should follow it's peer the NHL and consider expanding, we will use multi-linear regression to and other methods of statistical analysis to determine if the NBA should expand. Results show that the NBA has had their point per game increase a drastic amount in two decades and will continue to do so without an intervention. We can conclude the the NBA should strongly consider expanding and adding a new team the the beautiful game of Basketball.
+The NBA has not had an expansion in two decades. Using Data from the NBA and Basketball Reference we will investigate whether the NBA Should follow its peer the NHL and consider expanding, we will use multi-linear regression and other methods of statistical analysis to determine if the NBA should expand. Results show that the NBA has had their point per game increase a drastic amount in two decades and will continue to do so without intervention. We can conclude that the NBA should strongly consider expanding and adding a new team the the beautiful game of Basketball.
 
 ## File Structure
 
