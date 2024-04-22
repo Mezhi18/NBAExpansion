@@ -29,5 +29,7 @@ https://chat.openai.com/g/g-TgjKDuQwZ-r-wizard/c/3afbc5ed-df77-4253-b6c5-8f85ec3
 
 ## Data Collection
 
-The process of data collection from Basketball Reference was a rather odd and tedious process as for every table needed to copy and pasted into excel before being converted to a .csv file that could read by R. The instructions can be found in the following Link
+The process of data collection from Basketball Reference was a rather odd and tedious process as for every table needed to copy and pasted into excel before being converted to a .csv file that could read by R. The instructions can be found in the following Link:
+https://www.sports-reference.com/blog/2016/11/exporting-data/
+
 
